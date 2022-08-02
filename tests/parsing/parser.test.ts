@@ -38,7 +38,7 @@ describe("door", () => {
 });
 
 describe("invalid", () => {
-    it("Should throw an error for an invalid message", async () => {
+    it("Should throw an error for an invalid message type", async () => {
         const randomBytes = Buffer.allocUnsafe(10);
         const randomTokens = fromBuffer(randomBytes);
 
@@ -51,6 +51,19 @@ describe("invalid", () => {
             thrown = e.message;
         }
 
-        expect(thrown).toBe("parse::schema::unknown_message_type::invalid");
+        expect(thrown).toBe("parse::unknown_message_type::invalid");
+    });
+
+    it("Should throw an error when there's not enough data", async () => {
+        const h = Buffer.from([0x00]);
+        const t = fromBuffer(h);
+        try {
+            await parse("header", t);
+        } catch (e) {
+            // @ts-ignore
+            expect(e.message).toBe(
+                "parser::header::requester_id::read_error::End-Of-Stream"
+            );
+        }
     });
 });
