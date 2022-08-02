@@ -9,9 +9,3 @@ export const header = {
     message_type: UINT16_BE,
     packet_length: UINT24_BE,
 };
-
-export interface IParsedHeader {
-    requester_id: string;
-    message_type: number;
-    packet_length: number;
-}
