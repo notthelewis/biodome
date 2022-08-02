@@ -42,16 +42,13 @@ describe("invalid", () => {
         const randomBytes = Buffer.allocUnsafe(10);
         const randomTokens = fromBuffer(randomBytes);
 
-        let thrown = "";
         try {
             // @ts-ignore
             await parse("invalid", randomTokens);
         } catch (e) {
             // @ts-ignore
-            thrown = e.message;
+            expect(e.message).toBe("parse::unknown_message_type::invalid");
         }
-
-        expect(thrown).toBe("parse::unknown_message_type::invalid");
     });
 
     it("Should throw an error when there's not enough data", async () => {
