@@ -53,3 +53,5 @@ async function parse<T extends keyof typeof inbound_messages>(
 
     return to_return;
 }
+
+export default parse;
