@@ -2,46 +2,46 @@ import { inbound_messages } from "../messages";
 import { BufferTokenizer } from "strtok3/lib/BufferTokenizer";
 
 /**
- * Gets a message schema from it's cannonical name.
- * @param messages - The inbound_message object
- * @param message_name - The type of message.
+ * If a message field contains an array, return an array of numbers, otherwise
+ * return a single number.
  */
-function get_schema<T, U extends keyof T>(messages: T, message_name: U): T[U] {
-    return messages[message_name];
-}
+export type ParsedMessage<T extends keyof typeof inbound_messages> = {
+    [Property in keyof typeof inbound_messages[T]]: typeof inbound_messages[T][Property] extends Array<any>
+        ? Array<number>
+        : number;
+};
 
 /**
- * Parse a buffer into a given message type
- * @param message_type - The type of message to parse
- * @param buffer -  The buffer to parse from
- * @returns A parsed message
+ * Parse a message of a given type from a BufferTokenizer.
+ * @param message_type The type of message to parse
+ * @param buffer The tokenizer to parse from
+ * @returns An object representing the parsed message, containing each property of a message type alongside a number or a number[].
  */
-export default async function parse(
-    message_type: keyof typeof inbound_messages,
+async function parse<T extends keyof typeof inbound_messages>(
+    message_type: T,
     buffer: BufferTokenizer
-) {
-    const schema = get_schema(inbound_messages, message_type);
-    if (!schema) {
+): Promise<ParsedMessage<T>> {
+    // Validate whether the message type exists
+    if (!inbound_messages[message_type]) {
         throw new Error(
             `parse::schema::unknown_message_type::${String(message_type)}`
         );
     }
 
-    let to_return: {
-        [Property in keyof typeof schema as string]: number | string;
-    } = {};
+    let to_return: ParsedMessage<T> = {} as ParsedMessage<T>;
 
-    // Iterate each field of the schema
-    for await (const [key, entry] of Object.entries(schema)) {
-        // If the entry is an array, read the token at entry[0], entry[1] times,
-        // storing it as a string.
+    // Iterate each field of the message schema
+    for await (const [key, entry] of Object.entries(
+        inbound_messages[message_type]
+    )) {
+        // If the entry is an array, read the token at entry[0], entry[1] times
         if (Array.isArray(entry)) {
-            let temp = "";
+            let temp = [];
             // The @ts-ignores here are used because the object is instantiated
             // with no properties/entries.
             for (let i = 0; i < entry[1]; i++) {
                 // @ts-ignore
-                temp += await buffer.readToken(entry[0]);
+                temp.push(await buffer.readToken(entry[0]));
             }
             // @ts-ignore
             to_return[key] = temp;
