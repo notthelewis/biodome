@@ -23,9 +23,7 @@ async function parse<T extends keyof typeof inbound_messages>(
 ): Promise<ParsedMessage<T>> {
     // Validate whether the message type exists
     if (!inbound_messages[message_type]) {
-        throw new Error(
-            `parse::schema::unknown_message_type::${String(message_type)}`
-        );
+        throw new Error(`parse::unknown_message_type::${String(message_type)}`);
     }
 
     let to_return: ParsedMessage<T> = {} as ParsedMessage<T>;
@@ -34,20 +32,27 @@ async function parse<T extends keyof typeof inbound_messages>(
     for await (const [key, entry] of Object.entries(
         inbound_messages[message_type]
     )) {
-        // If the entry is an array, read the token at entry[0], entry[1] times
-        if (Array.isArray(entry)) {
-            let temp = [];
-            // The @ts-ignores here are used because the object is instantiated
-            // with no properties/entries.
-            for (let i = 0; i < entry[1]; i++) {
+        try {
+            // If the entry is an array, read the token at entry[0], entry[1] times
+            if (Array.isArray(entry)) {
+                let temp = [];
+                // The @ts-ignores here are used because the object is instantiated
+                // with no properties/entries.
+                for (let i = 0; i < entry[1]; i++) {
+                    // @ts-ignore
+                    temp.push(await buffer.readToken(entry[0]));
+                }
                 // @ts-ignore
-                temp.push(await buffer.readToken(entry[0]));
+                to_return[key] = temp;
+            } else {
+                // @ts-ignore
+                to_return[key] = await buffer.readToken(entry);
             }
-            // @ts-ignore
-            to_return[key] = temp;
-        } else {
-            // @ts-ignore
-            to_return[key] = await buffer.readToken(entry);
+        } catch (e) {
+            throw new Error(
+                // @ts-ignore
+                `parser::${message_type}::${key}::read_error::${e.message}`
+            );
         }
     }
 
