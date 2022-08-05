@@ -1,5 +1,8 @@
 import { inbound_messages } from "../messages/index";
 
+/** A buffer to store any message of a given type, alongside an offset for
+ * keeping track of the progress in reading it.
+ */
 export type MessageBuffer = {
     /** The position to write the next byte */
     offset: number;
@@ -7,7 +10,7 @@ export type MessageBuffer = {
     buf: Buffer;
 };
 
-/** An object containing one each message type as it's keys, and each
+/** An object containing one of each message type as it's keys, and each
  * key has a MessageBuffer as it's value.
  */
 export type ClientMessageBuffers = {
