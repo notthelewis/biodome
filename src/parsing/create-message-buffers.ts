@@ -61,3 +61,30 @@ export function create_buffers(): ClientMessageBuffers {
 
     return to_return;
 }
+
+/**
+ * Writes a byte to a buffer at the given offset, then increments offset.
+ * @param x - The value to write (UInt8)
+ * @param msg - The offset and buffer to write to.
+ * @returns Return whether this message has been fully read.
+ * @example Write 4 bytes to a counter object
+ * ```ts
+ * let msg = { offset: 0, buf: Buffer.alloc(4) };
+ * for (let i = 0; i <= 3; i++) {
+ *     if (write_to_offset(i, msg)) {
+ *         console.log(`Finished reading: ${offset} bytes`);
+ *         console.log('Result', msg.buf); // => Buffer([0, 1, 2, 3]);
+ *     }
+ * }
+ * ```
+ */
+export function write_at_offset(x: number, msg: MessageBuffer): boolean {
+    if (msg.offset < msg.buf.length - 1) {
+        msg.buf.writeUint8(x, msg.offset++);
+        return false;
+    }
+
+    msg.buf.writeUint8(x, msg.offset);
+    msg.offset = 0;
+    return false;
+}
