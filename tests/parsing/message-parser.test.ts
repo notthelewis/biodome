@@ -1,9 +1,8 @@
-import { writeFileSync, createReadStream } from "fs";
 import { pipeline, Readable, Writable } from "stream";
-import { message_codes } from "../../src/messages";
 import MessageParser from "../../src/parsing/message-parser";
 
 jest.setTimeout(30000);
+
 describe("valid", () => {
     const valid_message = Buffer.from([
         // header message
