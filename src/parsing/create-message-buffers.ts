@@ -86,5 +86,5 @@ export function write_at_offset(x: number, msg: MessageBuffer): boolean {
 
     msg.buf.writeUint8(x, msg.offset);
     msg.offset = 0;
-    return false;
+    return true;
 }
