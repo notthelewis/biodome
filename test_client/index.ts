@@ -1,4 +1,5 @@
-import { build_door, build_header } from "./build_messages";
+import { createConnection, createServer } from "net";
+import { build_door } from "./build_messages";
 
 const door_codes = {
     open_door: 0x01,
@@ -7,4 +8,7 @@ const door_codes = {
     unlock_door: 0x04,
 };
 
-console.log(build_door(door_codes.close_door));
+const connection = createConnection({ port: 9999 }, () => {
+    connection.write(build_door(door_codes.unlock_door));
+    connection.end();
+});
