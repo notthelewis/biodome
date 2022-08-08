@@ -7,7 +7,7 @@ export const inbound_messages = {
 };
 
 /** This is useful because the header does not have a message code */
-type MessagesWithoutHeader = Omit<typeof inbound_messages, "header">;
+export type MessagesWithoutHeader = Omit<typeof inbound_messages, "header">;
 
 export const message_codes = new Map<number, keyof MessagesWithoutHeader>();
 message_codes.set(0x0D, "door");
