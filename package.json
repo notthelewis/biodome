@@ -7,7 +7,8 @@
         "test": "jest",
         "compile": "npx tsup",
         "compile:live": "nodemon --watch 'src/**/*.ts' --exec \"ts-node\" src/index.ts",
-        "start": "npm run compile:live"
+        "start": "npm run compile:live",
+        "test:integration": "npx tsc -p ./test_client && node ./test_client/dist/test_client/index.js"
     },
     "keywords": [],
     "author": "",
