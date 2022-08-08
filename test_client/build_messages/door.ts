@@ -11,6 +11,12 @@ export default function build_door(command_id: number): Buffer {
     door_buffer.writeInt8(command, 1);
 
     const header = build_header("door", door_buffer.length);
-    console.log(`build_door::success::${format_buffer_string(header)}`);
-    return Buffer.concat([header, door_buffer]);
+    const fully_qualified_door_message = Buffer.concat([header, door_buffer]);
+    console.log(
+        `build_door::success::${
+            format_buffer_string(fully_qualified_door_message)
+        }`
+    );
+
+    return fully_qualified_door_message;
 }
